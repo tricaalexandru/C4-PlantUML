@@ -1,0 +1,32 @@
+@startuml Basic Sample
+!include https://raw.githubusercontent.com/adrianvlupu/C4-PlantUML/latest/C4_Container.puml
+
+Person(user, "MS-Teams user")
+Container(msgo_api_aggregator,"magpie API","GoLang","Tool used to update organisation specific information")
+System(bifrost, "Bifrost")
+System(magpie_microservices, "Microservice Data Control STack")
+System(ms_teams, "MS-Teams")
+Container(magpie_teams_app, "magpie Teams Application", "NodeJS", "Microsft Teams application for magpie")
+
+!$step = 1
+
+Rel_D(user, ms_teams, "Uses", $step)
+!$step = $step+1
+Rel_D(ms_teams, chatbot, "Chatscript interaction", $step)
+!$step = $step+1
+Rel_R(chatbot, magpie_teams_app, "User information from context", $step)
+!$step = $step+1
+Rel_D(magpie_teams_app, msgo_api_aggregator, "User.Authenticate", $step)
+!$step = $step+1
+Rel_D(msgo_api_aggregator, magpie_teams_app, "JWT Token", $step)
+!$step = $step+1
+Rel_D(magpie_teams_app, msgo_api_aggregator, "Profile.Update", $step)
+!$step = $step+1
+Rel_D(magpie_teams_app, msgo_api_aggregator, "Playlist.Fetch", $step)
+!$step = $step+1
+Rel_R(msgo_api_aggregator, magpie_microservices, "Generate Toekn, Update Profile, Retrieve Playlists", Recurrent)
+Rel_R(magpie_microservices, bifrost, "Trigger Bifrost", Recurrent)
+!$step = $step+1
+Rel_U(msgo_api_aggregator, magpie_teams_app, "Playlist retrieved", $step)
+
+@enduml

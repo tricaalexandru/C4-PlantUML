@@ -1,0 +1,29 @@
+@startuml Basic Sample
+!include https://raw.githubusercontent.com/adrianvlupu/C4-PlantUML/latest/C4_Container.puml
+
+Person(user, "User")
+Container(tropic_thunder, "Tropic Thunder", "React", "UI interface")
+Container(gf_aggregator, "GF-Aggregator", "GoLang", "Interfaces between the UI and the microservice stack")
+Container(msgo_event,"Event","GoLang","Stores the magpie fat events and acts as a gateway to the different brokers")
+Container(msgo_segment,"Segment","GoLang","Handles transmission of events in Segment format")
+Container(msgo_import_admin,"ImportAdmin","GoLang","Tool used to update organisation specific information")
+System(Segment, "Segment")
+System(CustomerIO, "CustomerIO")
+
+!$step = 1
+
+Rel_D(msgo_import_admin, msgo_segment, "Upload Segment Configurations")
+Rel_D(user, tropic_thunder, "Uses", $step)
+!$step = $step+1
+Rel_D(tropic_thunder, gf_aggregator, "trigger_event", $step)
+!$step = $step+1
+Rel_D(gf_aggregator, msgo_event, "Event.Create", $step)
+!$step = $step+1
+Rel_R(msgo_event, msgo_segment, "LRSBroker.Receiver", $step)
+!$step = $step+1
+Rel_R(msgo_segment, Segment, "Forward to Segment", $step)
+!$step = $step+1
+Rel_R(Segment, CustomerIO, "Forward to CustomerIO", $step)
+!$step = $step+1
+
+@enduml

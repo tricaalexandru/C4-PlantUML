@@ -1,0 +1,34 @@
+@startuml Basic Sample
+!include https://raw.githubusercontent.com/adrianvlupu/C4-PlantUML/latest/C4_Container.puml
+
+Person(user, "User")
+Container(tropic_thunder, "Tropic Thunder", "React", "UI interface")
+Container(gf_aggregator, "GF-Aggregator", "GoLang", "Interfaces between the UI and the microservice stack")
+Container(msgo_event,"Event","GoLang","Stores the magpie fat events and acts as a gateway to the different brokers")
+Container(msgo_reference,"References","GoLang","Stores data on inputs, competencies and asset types")
+Container(msgo_import_admin,"ImportAdmin","GoLang","Tool used to update organisation specific information")
+System(Bifrost, "Bifrost")
+
+!$step = 1
+
+Rel_D(msgo_import_admin, msgo_reference, "Upload Rex Goals")
+Rel_D(user, tropic_thunder, "Uses", $step)
+!$step = $step+1
+Rel_D(tropic_thunder, gf_aggregator, "RexGo.Get", $step)
+!$step = $step+1
+Rel_L(gf_aggregator, msgo_reference, "Reference.GetRexGo", $step)
+!$step = $step+1
+Rel_D(tropic_thunder, gf_aggregator, "goal_select", $step)
+!$step = $step+1
+Rel_D(gf_aggregator, msgo_event, "Event.Create", $step)
+!$step = $step+1
+Rel_D(tropic_thunder, gf_aggregator, "Bifrost.Trigger", $step)
+!$step = $step+1
+Rel_R(gf_aggregator, Bifrost, "trigger the bifrost", $step)
+!$step = $step+1
+Rel_U(gf_aggregator, tropic_thunder, "bifrost has prioritised", $step)
+!$step = $step+1
+Rel_U(tropic_thunder, user, "Refresh playlists?", $step)
+
+
+@enduml

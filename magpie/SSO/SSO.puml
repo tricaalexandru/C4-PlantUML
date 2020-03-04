@@ -1,0 +1,33 @@
+@startuml Basic Sample
+!include https://raw.githubusercontent.com/adrianvlupu/C4-PlantUML/latest/C4_Container.puml
+
+Person(user, "User")
+Container(tropic_thunder, "Tropic Thunder", "React", "UI interface")
+Container(msgo_openid, "OpenID", "GoLang", "Authenticates agains Keycloak")
+Container(msgo_auth, "Auth", "GoLang", "Stores the user information")
+Container(msgo_auth,"Auth","GoLang","Stores user authentication information")
+System(Keycloak, "Keycloak")
+System(CustomerIDP, "CustomerIDP")
+
+!$step = 1
+
+Rel_D(user, tropic_thunder, "Access the instance through the browser", $step)
+!$step = $step+1
+Rel_D(tropic_thunder, msgo_openid, "UI detects that the guest access is off and sends to the login URL", $step)
+!$step = $step+1
+Rel_L(msgo_openid, Keycloak, "Redirects user to Keycloak through OpenID connect", $step)
+!$step = $step+1
+Rel_L(Keycloak, CustomerIDP, "Detects the realm depends on an external IDP and starts the SP initiated login process", $step)
+!$step = $step+1
+Rel_R(CustomerIDP, Keycloak, "User logs in successfully and is sent back to Keycloak", $step)
+!$step = $step+1
+Rel_R(Keycloak, msgo_openid, "User is created in Keycloak and success message is sent to OpenID", $step)
+!$step = $step+1
+Rel_R(msgo_openid, msgo_auth, "User is added/updated in the magpie auth database and session is created", $step)
+!$step = $step+1
+Rel_L(msgo_auth, msgo_openid, "User information(UserID, SessionID, Org, Group, Meta) is passed back", $step)
+!$step = $step+1
+Rel_U(msgo_openid, tropic_thunder, "Cookie containing session is sent back to the UI", $step)
+!$step = $step+1
+
+@enduml
